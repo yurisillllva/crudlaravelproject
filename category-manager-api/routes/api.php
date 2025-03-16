@@ -15,7 +15,8 @@ use App\Http\Controllers\API\CategoryController;
 |
 */
 
-Route::apiResource('categories', CategoryController::class);
+Route::apiResource('categories', CategoryController::class)
+->except(['create', 'edit']);;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
