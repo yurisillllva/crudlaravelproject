@@ -16,21 +16,32 @@ class CategoryController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'parent_id' => 'nullable|exists:categories,id'
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'parent_id' => 'nullable|exists:categories,id'
+    ]);
 
-        $category = Category::create($validated);
-        return new CategoryResource($category->load('children'));
-    }
+    $category = Category::create($validated);
+    
+    return (new CategoryResource($category->load('children')))
+        ->response()
+        ->setStatusCode(201);
+}
 
-    public function show(Category $category)
-    {
-        return new CategoryResource($category->load('children', 'parent'));
+    public function show($id)
+{
+    $category = Category::with('children')->find($id);
+    
+    if (!$category) {
+        return response()->json([
+            'error' => 'Categoria não encontrada'
+        ], 404); 
     }
+    
+    return new CategoryResource($category);
+}
 
     public function update(Request $request, Category $category)
     {
@@ -51,6 +62,6 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 }
