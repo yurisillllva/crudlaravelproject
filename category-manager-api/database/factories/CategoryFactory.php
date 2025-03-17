@@ -24,4 +24,13 @@ class CategoryFactory extends Factory
                 ->create(['parent_id' => $category->id]);
         });
     }
+
+    // public function withParent()
+    // {
+    //     return $this->state(function (array $attributes) {
+    //         return [
+    //             'parent_id' => Category::factory()
+    //         ];
+    //     });
+    // }
 }
