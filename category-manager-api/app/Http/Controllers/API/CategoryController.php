@@ -9,11 +9,20 @@ use App\Http\Resources\CategoryResource;
 
 class CategoryController extends Controller
 {
-    public function index()
-    {
-        $categories = Category::with('children')->whereNull('parent_id')->get();
-        return CategoryResource::collection($categories);
+    public function index(Request $request)
+{
+    $query = Category::with('children');
+    
+    if ($request->has('parents_only')) {
+        $query->whereNull('parent_id');
     }
+
+    $categories = $query->get();
+
+    $categories = $query->paginate(5);
+    
+    return CategoryResource::collection($categories);
+}
 
     public function store(Request $request)
 {

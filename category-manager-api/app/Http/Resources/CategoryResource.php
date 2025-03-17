@@ -13,15 +13,15 @@ class CategoryResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'description' => $this->description,
-            'parent_id' => $this->parent_id,
-            'children' => CategoryResource::collection($this->whenLoaded('children')),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
-    }
+{
+    return [
+        'id' => $this->id,
+        'name' => $this->name,
+        'description' => $this->description,
+        'children' => CategoryResource::collection($this->whenLoaded('children')),
+        'links' => [
+            'self' => route('categories.show', $this->id)
+        ]
+    ];
+}
 }
