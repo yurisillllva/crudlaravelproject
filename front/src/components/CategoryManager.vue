@@ -108,7 +108,7 @@ export default {
           params: {
             page: page,
             search: this.searchQuery,
-            sort_by: '-created_at'
+            // sort_by: '-created_at'
           }
         });
         
