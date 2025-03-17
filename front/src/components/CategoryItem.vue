@@ -2,36 +2,30 @@
   <li class="list-group-item">
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <button 
-          @click="toggleChildren"
-          class="btn btn-sm mr-2"
-          v-if="hasChildren"
-        >
-          {{ showChildren ? '−' : '+' }}
-        </button>
-        {{ category.name }}
-        <small class="text-muted d-block">{{ category.description }}</small>
+        <span class="fw-bold">{{ category.name }}</span>
+        <p v-if="category.description" class="mb-0 text-muted">
+          {{ category.description }}
+        </p>
       </div>
       <div>
-        <button @click="$emit('edit', category)" class="btn btn-sm btn-warning">
-          Editar
-        </button>
-        <button @click="$emit('delete', category.id)" class="btn btn-sm btn-danger ml-2">
-          Excluir
+        <button 
+          class="btn btn-sm btn-outline-secondary"
+          @click="toggleChildren"
+        >
+          {{ showChildren ? '▲' : '▼' }}
         </button>
       </div>
     </div>
 
+    <!-- Subcategorias -->
     <ul 
-      v-if="showChildren && category.children"
-      class="list-group mt-2 ml-4"
+      v-if="showChildren && category.children.length > 0"
+      class="list-group mt-2 ms-4"
     >
       <category-item
         v-for="child in category.children"
         :key="child.id"
         :category="child"
-        @edit="$emit('edit', $event)"
-        @delete="$emit('delete', $event)"
       />
     </ul>
   </li>
@@ -39,21 +33,32 @@
 
 <script>
 export default {
-  props: ['category'],
+  name: 'CategoryItem',
+  props: {
+    category: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
     return {
       showChildren: false
     }
   },
-  computed: {
-    hasChildren() {
-      return this.category.children && this.category.children.length > 0
-    }
-  },
   methods: {
     toggleChildren() {
-      this.showChildren = !this.showChildren
+      this.showChildren = !this.showChildren;
     }
   }
 }
 </script>
+
+<style scoped>
+.list-group-item {
+  transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+  background-color: #f8f9fa;
+}
+</style>
