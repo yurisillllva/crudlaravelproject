@@ -4,7 +4,7 @@
     <category-modal
       :show="showCreateModal"
       @close="showCreateModal = false"
-      @save="handleSave"
+      @saved="handleSaved"
       :category="selectedCategory"
       :parent-categories="parentCategories"
     />
@@ -34,18 +34,24 @@
         v-for="category in categories"
         :key="category.id"
         :category="category"
+        @edit="handleEdit" 
+        @delete="handleDelete"
       />
     </ul>
-    <PaginationCategory/>
+    <PaginationCategory
+      :pagination-links="paginationLinks"
+      @page-changed="fetchCategories"
+    />
   </div>
 </template>
 
 <script>
 import CategoryItem from "./CategoryItem.vue";
 import CategoryModal from "./CategoryModal.vue";
+import PaginationCategory from './PaginationCategory.vue';
 
 export default {
-  components: { CategoryItem, CategoryModal },
+  components: { CategoryItem, CategoryModal, PaginationCategory },
   data() {
     return {
       currentPage: 1,
@@ -68,6 +74,25 @@ export default {
     await this.fetchCategories();
   },
   methods: {
+    async handleEdit(category) {
+      this.selectedCategory = category;
+      await this.fetchParentCategories();
+      this.showCreateModal = true;
+    },
+    async handleDelete(categoryId) {
+      if (confirm('Tem certeza que deseja excluir esta categoria?')) {
+        try {
+          await this.$axios.delete(`/categories/${categoryId}`);
+          this.fetchCategories(this.currentPage);
+        } catch (error) {
+          alert('Erro ao excluir categoria');
+        }
+      }
+    },
+     handleSaved() {
+      this.fetchCategories(this.currentPage); // Recarrega os dados
+      this.selectedCategory = null; // Limpa seleção
+    },
     async fetchParentCategories() {
       const response = await this.$axios.get("/categories?parents_only=1");
       this.parentCategories = response.data.data;
@@ -82,14 +107,15 @@ export default {
         const response = await this.$axios.get('/categories', {
           params: {
             page: page,
-            search: this.searchQuery
+            search: this.searchQuery,
+            sort_by: '-created_at'
           }
         });
         
         this.categories = response.data.data;
-        this.currentPage = response.data.current_page;
-        this.totalPages = response.data.last_page;
-        this.paginationLinks = response.data.links;
+        this.currentPage = response.data.meta.current_page;
+        this.totalPages = response.data.meta.last_page;
+        this.paginationLinks = response.data.meta.links;
       } catch (error) {
         console.error('Erro:', error);
       }

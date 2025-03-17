@@ -2,6 +2,7 @@
   <div v-if="show" class="modal fade show d-block" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
+        <form @submit.prevent="saveCategory"> 
         <div class="modal-header">
           <h5 class="modal-title">
             {{ category?.id ? 'Editar Categoria' : 'Nova Categoria' }}
@@ -35,10 +36,11 @@
           <button type="button" class="btn btn-secondary" @click="$emit('close')">
             Cancelar
           </button>
-          <button type="button" class="btn btn-primary" @click="handleSave">
+           <button type="submit" class="btn btn-primary">
             Salvar
           </button>
         </div>
+        </form>
       </div>
     </div>
   </div>
@@ -55,11 +57,11 @@ export default {
     parentCategories: Array
   },
   data() {
-    return {
+     return {
       formData: {
-        name: '',
-        description: '',
-        parent_id: null
+        name: this.category?.name || '',
+        description: this.category?.description || '',
+        parent_id: this.category?.parent_id || null
       }
     }
   },
@@ -74,17 +76,29 @@ export default {
     }
   },
   methods: {
-    resetForm() {
-      this.formData = {
-        name: '',
-        description: '',
-        parent_id: null
-      }
+    async saveCategory() {
+        try {
+            const response = await this.$axios({
+            method: this.category?.id ? 'put' : 'post',
+            url: this.category?.id ? `/categories/${this.category.id}` : '/categories',
+            data: this.formData
+            });
+            
+            if (response.status === 200 || response.status === 201) {
+            this.$emit('saved', response.data); // Passar dados salvos
+            this.$emit('close');
+            }
+        } catch (error) {
+            // Tratar erros de validação do Laravel
+            if (error.response?.status === 422) {
+            const errors = error.response.data.errors;
+            alert(Object.values(errors).join('\n'));
+            } else {
+            alert('Erro inesperado: ' + error.message);
+            }
+        }
     },
-    handleSave() {
-      this.$emit('save', this.formData)
-    }
-  }
+  },
 }
 </script>
 

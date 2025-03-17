@@ -16,13 +16,13 @@
       </div>
       <div>
         <button 
-          @click="$emit('edit', category)"
-          class="btn btn-sm btn-outline-primary mr-2"
+        @click="editCategory" 
+        class="btn btn-sm btn-outline-primary mr-2"
         >
           <i class="bi bi-pencil-square"></i>
         </button>
         <button 
-          @click="$emit('delete', category.id)"
+          @click="deleteCategory"
           class="btn btn-sm btn-outline-danger"
         >
           <i class="bi bi-trash"></i>
@@ -49,16 +49,24 @@ export default {
     return {
       isExpanded: false
     }
+  },
+  methods: {
+    editCategory() {
+      this.$emit('edit', this.category); // Emite evento de edição
+    },
+    deleteCategory() {
+      this.$emit('delete', this.category.id); // Emite evento de exclusão
+    }
   }
 }
 </script>
 
 <style scoped>
-/* .list-group-item {
+.list-group-item {
   transition: all 0.3s ease;
 }
 
 .list-group-item:hover {
   background-color: #f8f9fa;
-} */
+}
 </style>
