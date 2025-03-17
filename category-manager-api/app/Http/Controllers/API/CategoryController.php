@@ -11,7 +11,8 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
 {
-    $query = Category::with('children');
+    $query = Category::with('children')
+    ->orderBy('created_at', 'desc');
     
     if ($request->has('parents_only')) {
         $query->whereNull('parent_id');
